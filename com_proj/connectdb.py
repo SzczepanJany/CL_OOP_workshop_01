@@ -1,5 +1,6 @@
 #!/usr/bin/python
 #https://www.postgresqltutorial.com/postgresql-python/connect/
+from psycopg2 import connect
 
 from configparser import ConfigParser
 
@@ -19,3 +20,10 @@ def config_db(filename='database.ini', section='postgresql'):
         raise Exception('Section {0} not found in the {1} file'.format(section, filename))
 
     return db
+
+params = config_db()
+conn = connect(**params)
+cur = conn.cursor()
+# execute a statement
+print('PostgreSQL database version:')
+cur.execute('SELECT version()')

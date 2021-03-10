@@ -1,5 +1,5 @@
+from connectdb import config_db
 from psycopg2 import connect
-from connect_db import config_db
 
 params = config_db()
 conn = connect(**params)
