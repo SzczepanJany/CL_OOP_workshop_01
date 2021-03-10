@@ -1,7 +1,7 @@
 from psycopg2 import connect
-from connect_db import config
+from connect_db import config_db
 
-params = config()
+params = config_db()
 conn = connect(**params)
 cur = conn.cursor()
 # execute a statement
