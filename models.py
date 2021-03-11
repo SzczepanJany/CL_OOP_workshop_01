@@ -10,6 +10,21 @@ conn.autocommit = True
 class users():
 
     @staticmethod
+    def load_all_user(cursor):
+        sql="""select id, username, hashed_password from users """
+        cursor.execute(sql)
+        all_users = []
+        data = cursor.fetchall()
+        for row in data:
+            id_, username, hashed_password = row
+            loaded_user = users()
+            loaded_user.username = username
+            loaded_user._id = id_
+            loaded_user._hashed_password = hashed_password
+            all_users.append(loaded_user)
+        return all_users
+        
+    @staticmethod
     def load_user_by_id(cursor, id_):
         sql="""select id, username, hashed_password from users where id=%s"""
         cursor.execute(sql, (id_,))
@@ -69,11 +84,18 @@ class users():
     
 
 
-new_user = users('johny', 'tratata')
 cur = conn.cursor()
+new_user = users('johny', 'tratata')
+new_user1 = users('johana', 'trututu')
 new_user.save_to_db(cur)
+new_user1.save_to_db(cur)
 print(users.load_user_by_id(cur, 4))
 print(users.load_user_by_username(cur, 'johny'))
 
 print(users.load_user_by_id(cur, 2))
 print(users.load_user_by_username(cur, 'jony'))
+
+print(users.load_all_user(cur))
+all = users.load_all_user(cur)
+for i in all:
+    print(i.id, i.username)
