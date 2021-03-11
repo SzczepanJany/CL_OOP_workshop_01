@@ -87,6 +87,13 @@ class users():
             return True
         return False
     
+    def delete_user(self, cursor):
+        if self._id == -1:
+            sql=""" delete from users where id=%s"""
+            cursor.execute(sql,(self.id,))
+            self._id = -1
+            return True
+        return False
 
 
 cur = conn.cursor()
@@ -95,10 +102,13 @@ new_user1 = users('johana', 'trututu')
 new_user.save_to_db(cur)
 new_user1.save_to_db(cur)
 print(users.load_user_by_id(cur, 4))
-print(users.load_user_by_username(cur, 'johny'))
-
+old_user = users.load_user_by_id(cur, 34)
+print(old_user)
+old_user.username = 'sara'
+old_user.save_to_db(cur)
 print(users.load_user_by_id(cur, 2))
 print(users.load_user_by_username(cur, 'jony'))
+
 
 
 all = users.load_all_user(cur)
