@@ -80,6 +80,11 @@ class users():
             cursor.execute(sql,values)
             self._id = cursor.fetchone()[0]
             return True
+        else:
+            sql = """ update users set username=%s, hashed_password=%s where id=%s"""
+            values = (self.username, self.hashed_password, self.id)
+            cursor.execute(sql,values)
+            return True
         return False
     
 
@@ -95,7 +100,7 @@ print(users.load_user_by_username(cur, 'johny'))
 print(users.load_user_by_id(cur, 2))
 print(users.load_user_by_username(cur, 'jony'))
 
-print(users.load_all_user(cur))
+
 all = users.load_all_user(cur)
 for i in all:
     print(i.id, i.username)
