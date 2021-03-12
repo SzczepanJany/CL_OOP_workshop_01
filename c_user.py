@@ -31,7 +31,10 @@ if args.username and args.password and args.new_password == None and not args.de
         print(f"User {user.username} already exist")
     elif len(args.password) >= 8:
         new_user = models.users(args.username,args.password)
-        new_user.save_to_db(cur)
+        if new_user.save_to_db(cur):
+            print(f"User {args.username} added")
+        else:
+            print("Something went wrong")
     else:
         print("Password too short")
     
@@ -43,8 +46,16 @@ if args.username and args.password and args.new_password and not args.delete and
 
 #usuwanie -u -p -d
 if args.username and args.password and args.new_password == None and args.delete and not args.edit and not args.list:
+    cur = conn.cursor()
+    user = models.users.load_user_by_username(cur,str(args.username))
     if user and check_password(args.password,user.hashed_password):
-        pass
+        print(user.id)
+        if user.delete_user(cur):
+            print(f"User {args.username} deleted")
+        else:
+            print("Something went wrong")
+    else:
+        print("something went wrong")
 
 #listowanie -l 
 if args.username == None and args.password ==None and args.new_password == None and not args.delete and not args.edit and args.list:

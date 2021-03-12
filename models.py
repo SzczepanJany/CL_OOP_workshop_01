@@ -84,7 +84,7 @@ class users():
                 self._id = cursor.fetchone()[0]
                 return True
             except errors.UniqueViolation:
-                print(f"User {self.username} already exist")
+                return False
         else:
             try:
                 sql = """ update users set username=%s, hashed_password=%s where id=%s"""
@@ -92,11 +92,11 @@ class users():
                 cursor.execute(sql,values)
                 return True
             except errors.UniqueViolation:
-                print(f"User {self.username} already exist")
+                return False
         return False
     
     def delete_user(self, cursor):
-        if self._id == -1:
+        if self._id != -1:
             sql=""" delete from users where id=%s"""
             cursor.execute(sql,(self.id,))
             self._id = -1
