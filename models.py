@@ -1,4 +1,7 @@
+from enum import unique
 from hashlib import new
+
+import psycopg2
 from connectdb import config_db
 from psycopg2 import connect, errors
 from passwords import hash_password
@@ -76,16 +79,22 @@ class users():
 
     def save_to_db(self, cursor):
         if self._id == -1:
-            sql = """insert into users (username, hashed_password) values (%s, %s) returning id"""
-            values = (self.username, self.hashed_password)
-            cursor.execute(sql,values)
-            self._id = cursor.fetchone()[0]
-            return True
+            try:
+                sql = """insert into users (username, hashed_password) values (%s, %s) returning id"""
+                values = (self.username, self.hashed_password)
+                cursor.execute(sql,values)
+                self._id = cursor.fetchone()[0]
+                return True
+            except errors.UniqueViolation:
+                print(f"User {self.username} already exist")
         else:
-            sql = """ update users set username=%s, hashed_password=%s where id=%s"""
-            values = (self.username, self.hashed_password, self.id)
-            cursor.execute(sql,values)
-            return True
+            try:
+                sql = """ update users set username=%s, hashed_password=%s where id=%s"""
+                values = (self.username, self.hashed_password, self.id)
+                cursor.execute(sql,values)
+                return True
+            except errors.UniqueViolation:
+                print(f"User {self.username} already exist")
         return False
     
     def delete_user(self, cursor):
@@ -153,7 +162,7 @@ new_user1 = users('johana', 'trututu')
 new_user.save_to_db(cur)
 new_user1.save_to_db(cur)
 print(users.load_user_by_id(cur, 4))
-old_user = users.load_user_by_id(cur, 34)
+old_user = users.load_user_by_username(cur,'johny')
 print(old_user)
 old_user.username = 'sara'
 old_user.save_to_db(cur)
