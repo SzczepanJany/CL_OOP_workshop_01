@@ -28,7 +28,7 @@ def create_db():
 def create_table_users():
     cur = conn.cursor()
     try:
-        cur.execute('create table users(id serial not null, username varchar(255),hashed_password varchar(80) not null, primary key(id))')
+        cur.execute('create table users(id serial not null, username varchar(255) unique,hashed_password varchar(80) not null, primary key(id))')
     except errors.DuplicateTable:
         print("Table 'users' already exist")
     cur.close()
