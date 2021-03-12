@@ -122,6 +122,7 @@ class messages():
         self.m_text = m_text 
         self.from_id = from_id
         self.to_id = to_id
+        self.creation_date = None
 
     @property
     def id(self):
