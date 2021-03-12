@@ -1,11 +1,12 @@
 from enum import unique
 from hashlib import new
+import string
 
 import psycopg2
 from connectdb import config_db
 from psycopg2 import connect, errors
 from passwords import hash_password
-from datetime import datetime
+from datetime import datetime, date
 
 params = config_db('database.ini', 'postgresql_comm')
 conn = connect(**params)
@@ -125,6 +126,39 @@ class messages():
             loaded_message.creation_date = creation_date
             all_message.append(loaded_message)
         return all_message
+
+    def load_all_messages_to(cursor, to_id):
+        sql="""select id, m_text, from_id, to_id, creation_date from messages where to_id=%s"""
+        cursor.execute(sql, (to_id,))
+        all_message = []
+        data = cursor.fetchall()
+        for row in data:
+            id_, m_text, from_id, to_id, creation_date = row
+            loaded_message = messages()
+            loaded_message._id = id_
+            loaded_message.m_text = m_text
+            loaded_message.from_id = from_id
+            loaded_message.to_id = to_id
+            loaded_message.creation_date = creation_date
+            all_message.append(loaded_message)
+        return all_message    
+
+    def load_all_messages_to_day(cursor, to_id, day=date.today()):
+        sql="""select id, m_text, from_id, to_id, creation_date from messages where to_id=%s and to_char(creation_date, 'YYYY-MM-DD') like %s"""
+        values = '%' +  str(day) + '%'
+        cursor.execute(sql, (to_id, values))
+        all_message = []
+        data = cursor.fetchall()
+        for row in data:
+            id_, m_text, from_id, to_id, creation_date = row
+            loaded_message = messages()
+            loaded_message._id = id_
+            loaded_message.m_text = m_text
+            loaded_message.from_id = from_id
+            loaded_message.to_id = to_id
+            loaded_message.creation_date = creation_date
+            all_message.append(loaded_message)
+        return all_message        
         
     def __init__(self, m_text='', from_id='', to_id=''):
         self._id = -1
@@ -177,6 +211,8 @@ new_message1 = messages('test1', 32, 36)
 new_message2 = messages('test', 32, 37)
 new_message1.save_to_db(cur)
 new_message2.save_to_db(cur)
-all_m=messages.load_all_messages(cur)
+all_m=messages.load_all_messages_to_day(cur,37)
 for i in all_m:
     print(i.m_text,i.from_id,i.to_id,i.creation_date)
+
+print(date.today())
