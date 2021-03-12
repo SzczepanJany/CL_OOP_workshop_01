@@ -3,14 +3,11 @@ from hashlib import new
 import string
 
 import psycopg2
-from connectdb import config_db
 from psycopg2 import connect, errors
 from passwords import hash_password
 from datetime import datetime, date
 
-params = config_db('database.ini', 'postgresql_comm')
-conn = connect(**params)
-conn.autocommit = True
+
 
 class users():
 
@@ -189,30 +186,30 @@ class messages():
     
 
 
+if __name__ == '__main__':
+    cur = conn.cursor()
+    new_user = users('johny', 'tratata')
+    new_user1 = users('johana', 'trututu')
+    new_user.save_to_db(cur)
+    new_user1.save_to_db(cur)
+    print(users.load_user_by_id(cur, 4))
+    old_user = users.load_user_by_username(cur,'johny')
+    print(old_user)
+    old_user.username = 'sara'
+    old_user.save_to_db(cur)
+    print(users.load_user_by_id(cur, 2))
+    print(users.load_user_by_username(cur, 'jony'))
 
-cur = conn.cursor()
-new_user = users('johny', 'tratata')
-new_user1 = users('johana', 'trututu')
-new_user.save_to_db(cur)
-new_user1.save_to_db(cur)
-print(users.load_user_by_id(cur, 4))
-old_user = users.load_user_by_username(cur,'johny')
-print(old_user)
-old_user.username = 'sara'
-old_user.save_to_db(cur)
-print(users.load_user_by_id(cur, 2))
-print(users.load_user_by_username(cur, 'jony'))
+    all = users.load_all_user(cur)
+    for i in all:
+        print(i.id, i.username)
 
-all = users.load_all_user(cur)
-for i in all:
-    print(i.id, i.username)
+    new_message1 = messages('test1', 32, 36)
+    new_message2 = messages('test', 32, 37)
+    new_message1.save_to_db(cur)
+    new_message2.save_to_db(cur)
+    all_m=messages.load_all_messages_to_day(cur,37)
+    for i in all_m:
+        print(i.m_text,i.from_id,i.to_id,i.creation_date)
 
-new_message1 = messages('test1', 32, 36)
-new_message2 = messages('test', 32, 37)
-new_message1.save_to_db(cur)
-new_message2.save_to_db(cur)
-all_m=messages.load_all_messages_to_day(cur,37)
-for i in all_m:
-    print(i.m_text,i.from_id,i.to_id,i.creation_date)
-
-print(date.today())
+    print(date.today())
