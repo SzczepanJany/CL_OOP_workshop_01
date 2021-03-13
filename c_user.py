@@ -41,8 +41,20 @@ if args.username and args.password and args.new_password == None and not args.de
 
 #nowe hasło -u -p -e -n
 if args.username and args.password and args.new_password and not args.delete and args.edit and not args.list:
+    cur = conn.cursor()
+    user = models.users.load_user_by_username(cur,str(args.username))
     if user and check_password(args.password,user.hashed_password):
-        print('upen')
+        if len(args.new_password) >= 8:
+            user.set_password(args.new_password)
+            if user.save_to_db(cur):
+                print("Password changed")
+            else:
+                print("Something went wrong")
+        else:
+            print("Password too short")
+    else:
+        print("Something went wrong")    
+
 
 #usuwanie -u -p -d
 if args.username and args.password and args.new_password == None and args.delete and not args.edit and not args.list:
