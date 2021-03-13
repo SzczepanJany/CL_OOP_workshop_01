@@ -125,7 +125,8 @@ class messages():
         return all_message
 
     def load_all_messages_to(cursor, to_id):
-        sql="""select id, m_text, from_id, to_id, creation_date from messages where to_id=%s"""
+        sql="""select messages.id, m_text, uf.username, ut.username, creation_date from messages left join users uf on uf.id=messages.from_id left join users ut on ut.id=messages.to_id where messages.to_id=%s"""
+        #select messages.id, m_text, uf.username, ut.username, creation_date from messages left join users uf on uf.id=messages.from_id left join users ut on ut.id=messages.to_id where to_id=37;
         cursor.execute(sql, (to_id,))
         all_message = []
         data = cursor.fetchall()
